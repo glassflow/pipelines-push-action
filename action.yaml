@@ -52,7 +52,8 @@ runs:
         glassflow-push-pipelines \
           -y -t ${{ inputs.glassflow-personal-access-token }}\
           --files-deleted ${{ steps.changed-files.outputs.deleted_files }} \
-          --files-changed ${{ steps.changed-files.outputs.all_changed_files }}
+          --files-changed ${{ steps.changed-files.outputs.all_changed_files }}\
+          --pipelines-dir ${{ inputs.pipelines-dir }}
           
     - name: Commit new Pipeline IDs
       uses: stefanzweifel/git-auto-commit-action@v5
