@@ -1,0 +1,60 @@
+# action.yml
+name: 'GlassFlow action'
+description: 'This Github Action lets you automate GlassFlow pipelines deployments as code'
+branding:
+  icon: zap
+  color: purple
+inputs:
+  pipelines-dir:
+    description: |
+      Path to directory with GlassFlow pipelines.
+      Default 'pipelines/'
+    default: pipelines/
+  glassflow-personal-access-token:
+    description: |
+      GlassFlow personal access token to interact with API.
+    required: true
+  glassflow-version:
+    description: Version of the GlassFlow SDK
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Get file changes
+      id: changed-files
+      uses: tj-actions/changed-files@v45
+      with:
+        files: |
+          ${{ inputs.pipelines-dir }}/**/*.{py,yaml,yml}
+          ${{ inputs.pipelines-dir }}/**/requirements.txt
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip' # caching pip dependencies
+
+    - name: Install GlassFlow SDK
+      shell: bash
+      run: |
+        if [ ${{ inputs.glassflow-version }} ]; 
+        then
+          GLASSFLOW_VERSION=glassflow==${{ inputs.glassflow-version }};
+        else
+          GLASSFLOW_VERSION=glassflow;
+        fi;
+        python -m pip install --upgrade pip
+        python -m pip install $GLASSFLOW_VERSION
+
+    - name: Push changes to GlassFlow
+      id: push-to-glassflow
+      shell: bash
+      run: |
+        glassflow-push-pipelines \
+          -t ${{ inputs.glassflow-personal-access-token }}\
+          --files-deleted ${{ steps.changed-files.outputs.deleted_files }} \
+          --files-chaged ${{ steps.changed-files.outputs.all_changed_files }}
+          
+    - name: Commit new Pipeline IDs
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: Apply automatic changes (add new pipeline IDs)
