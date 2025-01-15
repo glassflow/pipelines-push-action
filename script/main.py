@@ -154,11 +154,11 @@ Expected changes on your GlassFlow pipelines:
         """
     )
     set_outputs({
-        "to_create_count": to_create,
-        "to_update_count": to_update,
-        "to_update_ids": to_update_ids,
-        "to_delete_count": to_delete,
-        "to_delete_ids": to_delete_ids,
+        "to-create-count": to_create,
+        "to-update-count": to_update,
+        "to-update-ids": to_update_ids,
+        "to-delete-count": to_delete,
+        "to-delete-ids": to_delete_ids,
     })
 
 
