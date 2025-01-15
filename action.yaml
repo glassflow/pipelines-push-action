@@ -75,7 +75,7 @@ runs:
           --files-deleted ${{ steps.changed-files.outputs.deleted_files }} \
           --files-changed ${{ steps.changed-files.outputs.all_changed_files }}\
           --pipelines-dir ${{ inputs.pipelines-dir }}"
-        echo args >> $GITHUB_OUTPUT
+        echo $args >> $GITHUB_OUTPUT
 
     - name: Run script to push pipelines
       id: push-to-glassflow
