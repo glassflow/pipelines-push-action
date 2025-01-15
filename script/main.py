@@ -201,7 +201,7 @@ def push_to_cloud(
         changed_pipelines = []
 
     generate_outputs(changed_pipelines, deleted_pipelines)
-    if not dry_run:
+    if dry_run:
         log.info("This is a dry run. No changes will be applied.")
         exit(0)
 
