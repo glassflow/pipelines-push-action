@@ -69,11 +69,11 @@ runs:
         then
           args+=" --dry-run";
         fi;
-        if [ ${{ steps.changed-files.outputs.deleted_files_count }} > 0 ];
+        if [ ${{ steps.changed-files.outputs.deleted_files }} ];
         then
           args+=" --files-deleted ${{ steps.changed-files.outputs.deleted_files }}";
         fi;
-        if [ ${{ steps.changed-files.outputs.all_changed_files_count }} > 0 ];
+        if [ ${{ steps.changed-files.outputs.all_changed_files }} ];
         then
           args+=" --files-changed ${{ steps.changed-files.outputs.all_changed_files }}";
         fi;
