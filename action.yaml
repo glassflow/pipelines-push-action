@@ -55,8 +55,8 @@ runs:
     - name: Download script and install dependencies
       shell: bash
       run: |
-        wget https://gfscripts.fra1.cdn.digitaloceanspaces.com/pipelines-push-action-script/glassflow-pipeline-push-test.tar.gz
-        tar -xzvf glassflow-pipeline-push-test.tar.gz
+        wget https://gfscripts.fra1.cdn.digitaloceanspaces.com/pipelines-push-action-script/glassflow-pipeline-push-v1.tar.gz
+        tar -xzvf glassflow-pipeline-push-v1.tar.gz
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
 
@@ -64,17 +64,19 @@ runs:
       id: set-arguments
       shell: bash
       run: |
+        args="args=-t ${{ inputs.glassflow-personal-access-token }} --pipelines-dir ${{ inputs.pipelines-dir }}";
         if [ ${{ inputs.dry-run == 'true' }} ]; 
         then
-          args="--dry-run";
-        else
-          args="";
+          args+=" --dry-run";
         fi;
-        args="${args} \
-          -t ${{ inputs.glassflow-personal-access-token }}\
-          --files-deleted ${{ steps.changed-files.outputs.deleted_files }} \
-          --files-changed ${{ steps.changed-files.outputs.all_changed_files }}\
-          --pipelines-dir ${{ inputs.pipelines-dir }}"
+        if [ ${{ steps.changed-files.outputs.deleted_files }} ];
+        then
+          args+=" --files-deleted ${{ steps.changed-files.outputs.deleted_files }}";
+        fi;
+        if [ ${{ steps.changed-files.outputs.all_changed_files }} ];
+        then
+          args+=" --files-changed ${{ steps.changed-files.outputs.all_changed_files }}";
+        fi;
         echo $args >> $GITHUB_OUTPUT
 
     - name: Run script to push pipelines

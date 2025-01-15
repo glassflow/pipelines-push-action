@@ -1,0 +1,25 @@
+name: Test
+on:
+  pull_request:
+
+jobs:
+  test:
+    name: Github Action Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test Local Action
+        id: test-action
+        uses: ./
+        with:
+          glassflow-personal-access-token: ${{ secrets.GlassFlowPAT }}
+          dry-run: 'true'
+          pipelines-dir: "."
+
+      - name: Print Output
+        id: output
+        run: |
+          echo "Pipelines to Create: ${{ steps.test-action.outputs.to-create-count }}"
+          echo "Pipelines to Update: ${{ steps.test-action.outputs.to-update-count }}"
+          echo "Pipelines to Delete: ${{ steps.test-action.outputs.to-delete-count }}"

@@ -131,7 +131,7 @@ def set_outputs(outputs: dict):
     """Write outputs to GITHUB_OUTPUT environment variable"""
     for k, v in outputs.items():
         with open(os.environ["GITHUB_OUTPUT"], 'a') as fh:
-            print(f"{k}={v}", file=fh)
+            fh.write(f"{k}={v}\n")
 
 
 def generate_outputs(
@@ -141,9 +141,9 @@ def generate_outputs(
     """Returns a dictionary of changes that will be applied"""
     to_create = len([p for p in changed_pipelines if p.id is None])
     to_update = len(changed_pipelines) - to_create
-    to_update_ids = [p.id for p in changed_pipelines if p.id is not None]
+    to_update_ids = " , ".join([p.id for p in changed_pipelines if p.id is not None])
     to_delete = len(deleted_pipelines)
-    to_delete_ids = [p.id for p in deleted_pipelines]
+    to_delete_ids = " , ".join([p.id for p in deleted_pipelines])
 
     log.info(
         f"""
@@ -154,11 +154,11 @@ Expected changes on your GlassFlow pipelines:
         """
     )
     set_outputs({
-        "to_create_count": to_create,
-        "to_update_count": to_update,
-        "to_update_ids": to_update_ids,
-        "to_delete_count": to_delete,
-        "to_delete_ids": to_delete_ids,
+        "to-create-count": to_create,
+        "to-update-count": to_update,
+        "to-update-ids": to_update_ids,
+        "to-delete-count": to_delete,
+        "to-delete-ids": to_delete_ids,
     })
 
 
