@@ -1,5 +1,5 @@
 # action.yml
-name: 'GlassFlow action'
+name: 'GlassFlow Pipelines Push action'
 description: 'This Github Action lets you automate GlassFlow pipelines deployments as code'
 branding:
   icon: zap
@@ -9,14 +9,33 @@ inputs:
     description: |
       Path to directory with GlassFlow pipelines.
       Default 'pipelines/'
-    default: pipelines/
+    default: "pipelines/"
   glassflow-personal-access-token:
     description: |
       GlassFlow personal access token to interact with API.
     required: true
-  glassflow-version:
-    description: Version of the GlassFlow SDK
+  dry-run:
+    description: Do not actually push any changes
     required: false
+    default: "false"
+
+outputs:
+  to-create-count:
+    description: Number of new pipelines to create
+    value: ${{ steps.push-to-glassflow.outputs.to-create-count }}
+  to-update-count:
+    description: Number of pipelines to update
+    value: ${{ steps.push-to-glassflow.outputs.to-update-count }}
+  to-update-ids:
+    description: Pipeline IDs that will be updated
+    value: ${{ steps.push-to-glassflow.outputs.to-update-ids }}
+  to-delete-count:
+    description: Number of pipelines to delete
+    value: ${{ steps.push-to-glassflow.outputs.to-delete-count }}
+  to-delete-ids:
+    description: Pipeline IDs that will be deleted
+    value: ${{ steps.push-to-glassflow.outputs.to-delete-ids }}
+
 runs:
   using: "composite"
   steps:
@@ -33,29 +52,39 @@ runs:
         python-version: '3.10'
         cache: 'pip' # caching pip dependencies
 
-    - name: Install GlassFlow SDK
+    - name: Download script and install dependencies
       shell: bash
       run: |
-        if [ ${{ inputs.glassflow-version }} ]; 
-        then
-          GLASSFLOW_VERSION=glassflow==${{ inputs.glassflow-version }};
-        else
-          GLASSFLOW_VERSION=glassflow;
-        fi;
+        wget https://gfscripts.fra1.cdn.digitaloceanspaces.com/pipelines-push-action-script/glassflow-pipeline-push-test.tar.gz
+        tar -xzvf glassflow-pipeline-push-test.tar.gz
         python -m pip install --upgrade pip
-        python -m pip install $GLASSFLOW_VERSION
+        python -m pip install -r requirements.txt
 
-    - name: Push changes to GlassFlow
+    - name: Set script arguments
+      id: set-arguments
+      shell: bash
+      run: |
+        if [ ${{ inputs.dry-run == 'true' }} ]; 
+        then
+          args="--dry-run";
+        else
+          args="";
+        fi;
+        args="${args} \
+          -t ${{ inputs.glassflow-personal-access-token }}\
+          --files-deleted ${{ steps.changed-files.outputs.deleted_files }} \
+          --files-changed ${{ steps.changed-files.outputs.all_changed_files }}\
+          --pipelines-dir ${{ inputs.pipelines-dir }}"
+        echo args >> $GITHUB_OUTPUT
+
+    - name: Run script to push pipelines
       id: push-to-glassflow
       shell: bash
       run: |
-        glassflow-push-pipelines \
-          -y -t ${{ inputs.glassflow-personal-access-token }}\
-          --files-deleted ${{ steps.changed-files.outputs.deleted_files }} \
-          --files-changed ${{ steps.changed-files.outputs.all_changed_files }}\
-          --pipelines-dir ${{ inputs.pipelines-dir }}
+        python main.py ${{ steps.set-arguments.outputs.args }}
           
     - name: Commit new Pipeline IDs
+      if: ${{ inputs.dry-run == 'false' }}
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: Apply automatic changes (add new pipeline IDs)
