@@ -1,0 +1,33 @@
+name: Test
+on:
+  pull_request:
+
+jobs:
+  test:
+    name: Github Action Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Add empty line to file to simulate changes in Pipeline
+      - name: Modify test pipelines
+        shell: bash
+        run: |
+          echo "" >> __fixtures__/pipeline.yaml
+
+      - name: Test Local Action
+        id: test-action
+        uses: ./
+        with:
+          glassflow-personal-access-token: ${{ secrets.GlassFlowPAT }}
+          dry-run: 'true'
+          pipelines-dir: "__fixtures__/"
+
+      - name: Print Output
+        id: output
+        run: |
+          echo "${{ steps.test-action.outputs.to-create-count }}"
+          echo "${{ steps.test-action.outputs.to-update-count }}"
+          echo "${{ steps.test-action.outputs.to-update-ids }}"
+          echo "${{ steps.test-action.outputs.to-delete-count }}"
+          echo "${{ steps.test-action.outputs.to-delete-ids }}"
