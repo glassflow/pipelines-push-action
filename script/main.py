@@ -127,28 +127,6 @@ def add_pipeline_id_to_yaml(yaml_path: Path, pipeline_id: str):
         f.write(f"pipeline_id: {pipeline_id}" + "\n" + content)
 
 
-def query_yes_no(question: str, default="yes") -> bool:
-    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
-    if default is None:
-        prompt = " [y/n] "
-    elif default == "yes":
-        prompt = " [Y/n] "
-    elif default == "no":
-        prompt = " [y/N] "
-    else:
-        raise ValueError(f"invalid default answer: '{default}'")
-
-    while True:
-        sys.stdout.write(question + prompt)
-        choice = input().lower()
-        if default is not None and choice == "":
-            return valid[default]
-        elif choice in valid:
-            return valid[choice]
-        else:
-            log.info("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
-
-
 def set_outputs(outputs: dict):
     """Write outputs to GITHUB_OUTPUT environment variable"""
     for k, v in outputs.items():
