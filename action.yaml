@@ -97,13 +97,13 @@ runs:
       id: run
       shell: bash
       run: |
-        cd ${{ steps.set-up.outputs.tempdir }}
+        cd ${{ steps.setup.outputs.tempdir }}
         python main.py ${{ steps.set-arguments.outputs.args }}
 
     - name: Clean up
       id: clean-up
       shell: bash
-      run: rm -rf ${{ steps.set-up.outputs.tempdir }}
+      run: rm -rf ${{ steps.setup.outputs.tempdir }}
           
     - name: Commit new Pipeline IDs
       if: ${{ (inputs.dry-run == 'false') && steps.run.outputs.to-create-ids }}
