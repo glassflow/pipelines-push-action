@@ -90,7 +90,6 @@ class TransformerComponent(BaseComponent):
 
 class SourceComponent(BaseComponent):
     type: Literal["source"]
-    inputs: list[str]
     kind: str | None = Field(None)
     config: dict | None = Field(None)
     config_secret_ref: str | None = Field(None)
