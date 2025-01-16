@@ -183,26 +183,19 @@ def push_to_cloud(
     client: GlassFlowClient,
     dry_run: bool = False,
 ):
-    if files_deleted is not None:
-        deleted_pipelines = [
-            yaml_file_to_pipeline(f, client.personal_access_token)
-            for f in files_deleted
-            if f.suffix in [".yaml", ".yml"]
-        ]
-    else:
-        deleted_pipelines = []
+    deleted_pipelines = [
+        yaml_file_to_pipeline(f, client.personal_access_token)
+        for f in files_deleted
+        if f.suffix in [".yaml", ".yml"]
+    ]
 
-    if files_changed is not None:
-        yaml_files_to_update = get_yaml_files_with_changes(
-            pipelines_dir=pipelines_dir, files=files_changed
-        )
-        changed_pipelines = [
-            yaml_file_to_pipeline(yaml_file, client.personal_access_token)
-            for yaml_file in yaml_files_to_update
-        ]
-    else:
-        yaml_files_to_update = []
-        changed_pipelines = []
+    yaml_files_to_update = get_yaml_files_with_changes(
+        pipelines_dir=pipelines_dir, files=files_changed
+    )
+    changed_pipelines = [
+        yaml_file_to_pipeline(yaml_file, client.personal_access_token)
+        for yaml_file in yaml_files_to_update
+    ]
 
     generate_outputs(changed_pipelines, deleted_pipelines)
     if dry_run:
@@ -252,10 +245,16 @@ def main():
         nargs="+",
     )
     parser.add_argument(
+        "--root-dir",
+        help="Github Root directory",
+        type=Path,
+        default="."
+    )
+    parser.add_argument(
         "--pipelines-dir",
         help="Path to directory with your GlassFlow pipelines.",
         type=Path,
-        default="pipelines/",
+        default="pipelines",
     )
     parser.add_argument(
         "-t",
@@ -272,11 +271,23 @@ def main():
     )
     args = parser.parse_args()
 
+    # Add root dir to paths
+    pipelines_dir = args.root_dir / args.pipelines_dir
+    if args.files_deleted:
+        files_deleted = [args.root_dir / p for p in args.files_deleted]
+    else:
+        files_deleted = []
+
+    if args.files_changed:
+        files_changed = [args.root_dir / p for p in args.files_changed]
+    else:
+        files_changed = []
+
     client = GlassFlowClient(personal_access_token=args.personal_access_token)
     push_to_cloud(
-        files_deleted=args.files_deleted,
-        files_changed=args.files_changed,
-        pipelines_dir=args.pipelines_dir,
+        files_deleted=files_deleted,
+        files_changed=files_changed,
+        pipelines_dir=pipelines_dir,
         client=client,
         dry_run=args.dry_run,
     )

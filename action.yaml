@@ -78,8 +78,8 @@ runs:
       id: set-arguments
       shell: bash
       run: |
-        args="args=-t ${{ inputs.glassflow-personal-access-token }} --pipelines-dir ${{ inputs.pipelines-dir }}";
-        if ${{ inputs.dry-run == 'true' }}; 
+        args="args=--root-dir ${{ github.workspace }} -t ${{ inputs.glassflow-personal-access-token }} --pipelines-dir ${{ inputs.pipelines-dir }}";
+        if [ ${{ inputs.dry-run == 'true' }} ]; 
         then
           args+=" --dry-run";
         fi;
