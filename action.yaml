@@ -55,13 +55,22 @@ runs:
         python-version: '3.10'
         cache: 'pip' # caching pip dependencies
 
-    - name: Download script and install dependencies
+    - name: Setup
       shell: bash
+      id: setup
       run: |
         VERSION=1
+        TEMPDIR=/tmp/action-script/
+        mkdir -p ${TEMPDIR}
+        cd ${TEMPDIR}
+        echo "tempdir=${TEMPDIR}" >> $GITHUB_OUTPUT
+        
+        echo "Downloading action script ..."
         wget "https://github.com/glassflow/pipelines-push-action/archive/refs/tags/v${VERSION}.tar.gz"
         tar -xzvf v${VERSION}.tar.gz
         cp pipelines-push-action-${VERSION}/script/* .
+        
+        echo "Installing python dependencies ..."
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
 
@@ -84,15 +93,20 @@ runs:
         fi;
         echo $args >> $GITHUB_OUTPUT
 
-    - name: Run script to push pipelines
-      id: push-to-glassflow
+    - name: Run
+      id: run
       shell: bash
       run: |
+        cd ${{ steps.setup.outputs.tempdir }}
         python main.py ${{ steps.set-arguments.outputs.args }}
+
+    - name: Clean up
+      id: clean-up
+      shell: bash
+      run: rm -rf ${{ steps.setup.outputs.tempdir }}
           
     - name: Commit new Pipeline IDs
-      if: ${{ inputs.dry-run == 'false' }}
+      if: ${{ (inputs.dry-run == 'false') && steps.run.outputs.to-create-ids }}
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: Apply automatic changes (add new pipeline IDs)
-        file_pattern: ${{ steps.push-to-glassflow.outputs.to-create-ids }}
