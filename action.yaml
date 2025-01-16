@@ -58,7 +58,7 @@ runs:
         VERSION=1
         wget "https://github.com/glassflow/pipelines-push-action/archive/refs/tags/v${VERSION}.tar.gz"
         tar -xzvf v${VERSION}.tar.gz
-        cp "pipelines-push-action-${VERSION}/script/*" .
+        cp pipelines-push-action-${VERSION}/script/* .
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
 
