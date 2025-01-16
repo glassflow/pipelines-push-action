@@ -32,7 +32,7 @@ jobs:
 ## Inputs
 
 - **glassflow-personal-access-token** _(required)_ - GlassFlow Personal Access Token (can be found in your profile https://app.glassflow.dev/profile). Use Github secrets to store your GlassFlow Personal Access Token.
-- **pipelines-dir** _(optional)_ - The directory containing your pipelines (Default: `'pipelines/'`).
+- **pipelines-dir** _(optional)_ - The directory containing your pipelines (Default: `'pipelines'`).
 - **dry-run** _(optional)_ - If set to 'true' the action will not push changes to GlassFlow (Default: `'false'`).
 
 ## Outputs
