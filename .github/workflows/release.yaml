@@ -29,17 +29,6 @@ jobs:
         with:
           tag: ${{ steps.bumpr.outputs.next_version }}
 
-      # tar.gz script
-      # upload new script to digital ocean
-#      - name: Deploy new script version
-#        shell: bash
-#        run: |
-#          FILE=glassflow-pipelines-push-v${{ steps.bumpr.outputs.next_version }}.tar.gz
-#          cd scripts/
-#          tar -cvzf ../$FILE .
-#          cd ..
-#          s3cmd put $FILE s3://gfscripts/pipelines-push-action-script/
-
       # Create release.
       - uses: shogo82148/actions-create-release@v1
         if: "steps.tag.outputs.value != ''"
