@@ -8,8 +8,8 @@ inputs:
   pipelines-dir:
     description: |
       Path to directory with GlassFlow pipelines.
-      Default 'pipelines/'
-    default: "pipelines/"
+      Default 'pipelines'
+    default: "pipelines"
   glassflow-personal-access-token:
     description: |
       GlassFlow personal access token to interact with API.
