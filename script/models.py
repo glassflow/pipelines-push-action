@@ -76,7 +76,7 @@ class Transformation(BaseModel):
 
 class BaseComponent(BaseModel):
     id: str
-    name: str
+    name: str | None = Field(None)
     type: str
 
 

@@ -70,7 +70,7 @@ runs:
       shell: bash
       run: |
         args="args=-t ${{ inputs.glassflow-personal-access-token }} --pipelines-dir ${{ inputs.pipelines-dir }}";
-        if [ ${{ inputs.dry-run == 'true' }} ]; 
+        if ${{ inputs.dry-run == 'true' }}; 
         then
           args+=" --dry-run";
         fi;
