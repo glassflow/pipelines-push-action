@@ -82,10 +82,10 @@ class BaseComponent(BaseModel):
 
 class TransformerComponent(BaseComponent):
     type: Literal["transformer"]
-    requirements: Requirements
+    requirements: Requirements | None = Field(None)
     transformation: Transformation
     inputs: list[str]
-    env_vars: list[EnvironmentVariable]
+    env_vars: list[EnvironmentVariable] | None = Field(None)
 
 
 class SourceComponent(BaseComponent):
