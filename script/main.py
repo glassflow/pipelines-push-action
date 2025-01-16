@@ -145,9 +145,9 @@ def generate_outputs(
     """Returns a dictionary of changes that will be applied"""
     to_create = len([p for p in changed_pipelines if p.id is None])
     to_update = len(changed_pipelines) - to_create
-    to_update_ids = " , ".join([p.id for p in changed_pipelines if p.id is not None])
+    to_update_ids = " ".join([p.id for p in changed_pipelines if p.id is not None])
     to_delete = len(deleted_pipelines)
-    to_delete_ids = " , ".join([p.id for p in deleted_pipelines])
+    to_delete_ids = " ".join([p.id for p in deleted_pipelines])
 
     log.info(
         f"""
@@ -209,10 +209,12 @@ def push_to_cloud(
         log.info("This is a dry run. No changes will be applied.")
         exit(0)
 
+    new_pipeline_ids = []
     for pipeline, yaml_file in zip(changed_pipelines, yaml_files_to_update):
         if pipeline.id is None:
             # Create pipeline
             new_pipeline = pipeline.create()
+            new_pipeline_ids.append(new_pipeline.id)
             add_pipeline_id_to_yaml(yaml_file, new_pipeline.id)
         else:
             # Update pipeline
@@ -227,6 +229,8 @@ def push_to_cloud(
                 source_config=pipeline.source_config,
                 env_vars=pipeline.env_vars,
             )
+    if new_pipeline_ids:
+        set_outputs({"to-create-ids": " ".join(new_pipeline_ids)})
 
 
 def main():

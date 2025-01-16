@@ -38,6 +38,7 @@ jobs:
 ## Outputs
 
 - **to-create-count** - Number of new pipelines to create.
+- **to-create-ids** - Pipeline IDs that are created (only available if input `dry-run` is `false`).
 - **to-update-count** - Number of pipelines to update.
 - **to-update-ids** - Pipeline IDs that will be updated.
 - **to-delete-count** - Number of pipelines to delete.
