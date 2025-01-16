@@ -61,9 +61,9 @@ runs:
       run: |
         VERSION=1
         TEMPDIR=/tmp/action-script/
-        mkdir -p TEMPDIR
-        cd TEMPDIR
-        echo "tempdir=TEMPDIR" >> $GITHUB_OUTPUT
+        mkdir -p ${TEMPDIR}
+        cd ${TEMPDIR}
+        echo "tempdir=${TEMPDIR}" >> $GITHUB_OUTPUT
         
         echo "Downloading action script ..."
         wget "https://github.com/glassflow/pipelines-push-action/archive/refs/tags/v${VERSION}.tar.gz"
