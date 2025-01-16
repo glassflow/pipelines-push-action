@@ -55,7 +55,11 @@ def yaml_file_to_pipeline(
             f.write(transformer.transformation.value)
 
     pipeline_id = str(p.pipeline_id) if p.pipeline_id is not None else None
-    env_vars = [e.model_dump(exclude_none=True) for e in transformer.env_vars]
+
+    if transformer.env_vars is not None:
+        env_vars = [e.model_dump(exclude_none=True) for e in transformer.env_vars]
+    else:
+        env_vars = None
 
     # TODO: Handle source and sink config_secret_ref
     # TODO: Handle env_var value_secret_ref
