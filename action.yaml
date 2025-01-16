@@ -55,8 +55,10 @@ runs:
     - name: Download script and install dependencies
       shell: bash
       run: |
-        wget https://gfscripts.fra1.cdn.digitaloceanspaces.com/pipelines-push-action-script/glassflow-pipeline-push-v1.tar.gz
-        tar -xzvf glassflow-pipeline-push-v1.tar.gz
+        VERSION=1
+        wget "https://github.com/glassflow/pipelines-push-action/archive/refs/tags/v${VERSION}.tar.gz"
+        tar -xzvf v${VERSION}.tar.gz
+        cd "pipelines-push-action-${VERSION}/script/"
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
 
