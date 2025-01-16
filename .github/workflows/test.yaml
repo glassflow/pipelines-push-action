@@ -15,7 +15,7 @@ jobs:
         with:
           glassflow-personal-access-token: ${{ secrets.GlassFlowPAT }}
           dry-run: 'true'
-          pipelines-dir: "script/"
+          pipelines-dir: "script"
 
       - name: Print Output
         id: output
