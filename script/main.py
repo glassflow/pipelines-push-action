@@ -188,6 +188,8 @@ def push_to_cloud(
         for f in files_deleted
         if f.suffix in [".yaml", ".yml"]
     ]
+    for file in files_deleted:
+        file.unlink()
 
     yaml_files_to_update = get_yaml_files_with_changes(
         pipelines_dir=pipelines_dir, files=files_changed
