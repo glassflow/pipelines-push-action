@@ -73,7 +73,7 @@ runs:
       shell: bash
       id: setup
       run: |
-        if [ ${{ inputs.sha }} ];
+        if [ "${{ inputs.sha }}" ];
         then
           VERSION=$(echo ${{ inputs.sha }} | cut -c1-7)
           ARCHIVE=${VERSION}.tar.gz
