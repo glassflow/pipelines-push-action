@@ -18,6 +18,11 @@ inputs:
       Path to directory with GlassFlow pipelines.
       Default 'pipelines'
     default: "pipelines"
+  sha:
+    description: |
+      SHA from github action commit to use. If empy, it will use latest version.
+      Default ''
+    default: ""
 
 outputs:
   to-create-count:
@@ -68,16 +73,26 @@ runs:
       shell: bash
       id: setup
       run: |
-        VERSION=1
+        if [ ${{ inputs.sha }} ];
+        then
+          VERSION=$(echo ${{ inputs.sha }} | cut -c1-7)
+          ARCHIVE=${VERSION}.tar.gz
+          SCRIPT_DIR=pipelines-push-action-${{ inputs.sha }}
+        else
+          VERSION=1
+          ARCHIBE=refs/tags/v${VERSION}.tar.gz
+          SCRIPT_DIR=pipelines-push-action-${VERSION}
+        fi;
+        
         TEMPDIR=/tmp/action-script/
         mkdir -p ${TEMPDIR}
         cd ${TEMPDIR}
         echo "tempdir=${TEMPDIR}" >> $GITHUB_OUTPUT
         
         echo "Downloading action script ..."
-        wget "https://github.com/glassflow/pipelines-push-action/archive/refs/tags/v${VERSION}.tar.gz"
-        tar -xzvf v${VERSION}.tar.gz
-        cp pipelines-push-action-${VERSION}/* .
+        wget "https://github.com/glassflow/pipelines-push-action/archive/${ARCHIVE}"
+        tar -xzvf *.tar.gz
+        cp ${SCRIPT_DIR}/* .
         
         echo "Installing python dependencies ..."
         python -m pip install --upgrade pip
