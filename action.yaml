@@ -81,7 +81,7 @@ runs:
       id: set-arguments
       shell: bash
       run: |
-        args="args=--root-dir ${{ github.workspace }} -t ${{ inputs.glassflow-personal-access-token }} --pipelines-dir ${{ inputs.pipelines-dir }}";
+        args="args=-t ${{ inputs.glassflow-personal-access-token }} --pipelines-dir ${{ inputs.pipelines-dir }}";
         if ${{ inputs.dry-run == 'true' }}; 
         then
           args+=" --dry-run";
@@ -100,8 +100,7 @@ runs:
       id: run
       shell: bash
       run: |
-        cd ${{ steps.setup.outputs.tempdir }}
-        python main.py ${{ steps.set-arguments.outputs.args }}
+        python ${{ steps.setup.outputs.tempdir }}/main.py ${{ steps.set-arguments.outputs.args }}
 
     - name: Clean up
       id: clean-up
