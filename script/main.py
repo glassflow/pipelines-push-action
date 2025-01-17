@@ -113,7 +113,10 @@ def map_yaml_to_files(path: Path) -> dict[Path, list[Path]]:
         else:
             continue
 
-        if transformer.requirements.path is not None:
+        if (
+                transformer.requirements is not None and
+                transformer.requirements.path is not None
+        ):
             path = file.parent / transformer.requirements.path
             mapping[file].append(path)
 
