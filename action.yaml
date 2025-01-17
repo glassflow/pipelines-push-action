@@ -22,22 +22,22 @@ inputs:
 outputs:
   to-create-count:
     description: Number of new pipelines to create
-    value: ${{ steps.push-to-glassflow.outputs.to-create-count }}
+    value: ${{ steps.run.outputs.to-create-count }}
   to-create-ids:
     description: Pipeline IDs that were created
-    value: ${{ steps.push-to-glassflow.outputs.to-create-ids }}
+    value: ${{ steps.run.outputs.to-create-ids }}
   to-update-count:
     description: Number of pipelines to update
-    value: ${{ steps.push-to-glassflow.outputs.to-update-count }}
+    value: ${{ steps.run.outputs.to-update-count }}
   to-update-ids:
     description: Pipeline IDs that will be updated
-    value: ${{ steps.push-to-glassflow.outputs.to-update-ids }}
+    value: ${{ steps.run.outputs.to-update-ids }}
   to-delete-count:
     description: Number of pipelines to delete
-    value: ${{ steps.push-to-glassflow.outputs.to-delete-count }}
+    value: ${{ steps.run.outputs.to-delete-count }}
   to-delete-ids:
     description: Pipeline IDs that will be deleted
-    value: ${{ steps.push-to-glassflow.outputs.to-delete-ids }}
+    value: ${{ steps.run.outputs.to-delete-ids }}
 
 runs:
   using: "composite"
