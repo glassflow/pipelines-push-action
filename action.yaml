@@ -73,15 +73,16 @@ runs:
       shell: bash
       id: setup
       run: |
-        if [ "${{ inputs.sha }}" ];
+        SHA="${{ inputs.sha }}"
+        if [ ${SHA} ];
         then
-          VERSION=$(echo ${{ inputs.sha }} | cut -c1-7)
-          ARCHIVE=${VERSION}.tar.gz
-          SCRIPT_DIR=pipelines-push-action-${{ inputs.sha }}
+          VERSION=$(echo ${SHA} | cut -c1-7)
+          ARCHIVE="${VERSION}.tar.gz"
+          SCRIPT_DIR="pipelines-push-action-${SHA}"
         else
           VERSION=1
-          ARCHIBE=refs/tags/v${VERSION}.tar.gz
-          SCRIPT_DIR=pipelines-push-action-${VERSION}
+          ARCHIVE="refs/tags/v${VERSION}.tar.gz"
+          SCRIPT_DIR="pipelines-push-action-${VERSION}"
         fi;
         
         TEMPDIR=/tmp/action-script/
