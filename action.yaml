@@ -46,6 +46,9 @@ runs:
       id: changed-files
       uses: tj-actions/changed-files@v45
       with:
+        recover_deleted_files: 'true'
+        recover_files: |
+          ${{ inputs.pipelines-dir }}/**/*.{yaml,yml}
         files: |
           ${{ inputs.pipelines-dir }}/**/*.{py,yaml,yml}
           ${{ inputs.pipelines-dir }}/**/requirements.txt
