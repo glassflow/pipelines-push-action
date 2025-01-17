@@ -5,19 +5,24 @@ branding:
   icon: zap
   color: purple
 inputs:
+  dry-run:
+    description: Do not actually push any changes
+    required: false
+    default: "false"
+  glassflow-personal-access-token:
+    description: |
+      GlassFlow personal access token to interact with API.
+    required: true
   pipelines-dir:
     description: |
       Path to directory with GlassFlow pipelines.
       Default 'pipelines'
     default: "pipelines"
-  glassflow-personal-access-token:
+  sha:
     description: |
-      GlassFlow personal access token to interact with API.
-    required: true
-  dry-run:
-    description: Do not actually push any changes
-    required: false
-    default: "false"
+      SHA from github action commit to use. If empy, it will use latest version.
+      Default ''
+    default: ""
 
 outputs:
   to-create-count:
@@ -38,6 +43,12 @@ outputs:
   to-delete-ids:
     description: Pipeline IDs that will be deleted
     value: ${{ steps.run.outputs.to-delete-ids }}
+  space-to-create-count:
+    description: Number of spaces to be created
+    value: ${{ steps.run.outputs.space-to-create-count }}
+  spaces-to-create-ids:
+    description: Space IDs that were created
+    value: ${{ steps.run.outputs.spaces-to-create-ids }}
 
 runs:
   using: "composite"
@@ -62,16 +73,26 @@ runs:
       shell: bash
       id: setup
       run: |
-        VERSION=1
+        if [ ${{ inputs.sha }} ];
+        then
+          VERSION=$(echo ${{ inputs.sha }} | cut -c1-7)
+          ARCHIVE=${VERSION}.tar.gz
+          SCRIPT_DIR=pipelines-push-action-${{ inputs.sha }}
+        else
+          VERSION=1
+          ARCHIBE=refs/tags/v${VERSION}.tar.gz
+          SCRIPT_DIR=pipelines-push-action-${VERSION}
+        fi;
+        
         TEMPDIR=/tmp/action-script/
         mkdir -p ${TEMPDIR}
         cd ${TEMPDIR}
         echo "tempdir=${TEMPDIR}" >> $GITHUB_OUTPUT
         
         echo "Downloading action script ..."
-        wget "https://github.com/glassflow/pipelines-push-action/archive/refs/tags/v${VERSION}.tar.gz"
-        tar -xzvf v${VERSION}.tar.gz
-        cp pipelines-push-action-${VERSION}/script/* .
+        wget "https://github.com/glassflow/pipelines-push-action/archive/${ARCHIVE}"
+        tar -xzvf *.tar.gz
+        cp -r ${SCRIPT_DIR}/* .
         
         echo "Installing python dependencies ..."
         python -m pip install --upgrade pip
@@ -100,7 +121,7 @@ runs:
       id: run
       shell: bash
       run: |
-        python ${{ steps.setup.outputs.tempdir }}/main.py ${{ steps.set-arguments.outputs.args }}
+        python ${{ steps.setup.outputs.tempdir }}/src/script/main.py ${{ steps.set-arguments.outputs.args }}
 
     - name: Clean up
       id: clean-up
