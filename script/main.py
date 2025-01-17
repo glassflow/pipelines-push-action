@@ -220,6 +220,7 @@ def push_to_cloud(
             new_pipeline = pipeline.create()
             new_pipeline_ids.append(new_pipeline.id)
             add_pipeline_id_to_yaml(yaml_file, new_pipeline.id)
+            log.info(f"Created pipeline {new_pipeline.id}")
         else:
             # Update pipeline
             existing_pipeline = client.get_pipeline(pipeline.id)
@@ -233,6 +234,10 @@ def push_to_cloud(
                 source_config=pipeline.source_config,
                 env_vars=pipeline.env_vars,
             )
+            log.info(f"Updated pipeline {pipeline.id}")
+
+    delete_pipelines(files_deleted, client)
+
     if new_pipeline_ids:
         set_outputs({"to-create-ids": " ".join(new_pipeline_ids)})
 
