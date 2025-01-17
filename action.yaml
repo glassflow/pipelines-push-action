@@ -92,7 +92,7 @@ runs:
         echo "Downloading action script ..."
         wget "https://github.com/glassflow/pipelines-push-action/archive/${ARCHIVE}"
         tar -xzvf *.tar.gz
-        cp ${SCRIPT_DIR}/* .
+        cp -r ${SCRIPT_DIR}/* .
         
         echo "Installing python dependencies ..."
         python -m pip install --upgrade pip
