@@ -5,19 +5,19 @@ branding:
   icon: zap
   color: purple
 inputs:
+  dry-run:
+    description: Do not actually push any changes
+    required: false
+    default: "false"
+  glassflow-personal-access-token:
+    description: |
+      GlassFlow personal access token to interact with API.
+    required: true
   pipelines-dir:
     description: |
       Path to directory with GlassFlow pipelines.
       Default 'pipelines'
     default: "pipelines"
-  glassflow-personal-access-token:
-    description: |
-      GlassFlow personal access token to interact with API.
-    required: true
-  dry-run:
-    description: Do not actually push any changes
-    required: false
-    default: "false"
 
 outputs:
   to-create-count:
@@ -71,7 +71,7 @@ runs:
         echo "Downloading action script ..."
         wget "https://github.com/glassflow/pipelines-push-action/archive/refs/tags/v${VERSION}.tar.gz"
         tar -xzvf v${VERSION}.tar.gz
-        cp pipelines-push-action-${VERSION}/script/* .
+        cp pipelines-push-action-${VERSION}/* .
         
         echo "Installing python dependencies ..."
         python -m pip install --upgrade pip
@@ -100,7 +100,7 @@ runs:
       id: run
       shell: bash
       run: |
-        python ${{ steps.setup.outputs.tempdir }}/main.py ${{ steps.set-arguments.outputs.args }}
+        python ${{ steps.setup.outputs.tempdir }}/src/script/main.py ${{ steps.set-arguments.outputs.args }}
 
     - name: Clean up
       id: clean-up

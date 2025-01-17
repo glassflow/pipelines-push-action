@@ -4,21 +4,26 @@ Keep here until we transition to full support of YAML
 
 from __future__ import annotations
 
-import uuid
 from typing import Annotated, Literal, Union
 
 from pydantic import BaseModel, Field, ValidationError, model_validator
 
 
-class GlassFlowConfig(BaseModel):
-    organization_id: uuid.UUID
-
-
 class Pipeline(BaseModel):
     name: str
-    pipeline_id: uuid.UUID | None = Field(None)
-    space_id: uuid.UUID
+    pipeline_id: str | None = Field(None)
+    space_id: str | None = Field(None)
+    space_name: str | None = Field(None)
     components: list[Component]
+
+    @model_validator(mode="after")
+    def check_space_filled(self):
+        """Validate space is filled"""
+        if self.space_id is None and self.space_name is None:
+            raise ValidationError("`space_id` or `space_name` must be filled")
+        if self.pipeline_id is not None and self.space_id is None:
+            raise ValidationError("If `pipeline_id` is provided you must specify it's `space_id`")
+        return self
 
     @model_validator(mode="after")
     def check_components(self):
