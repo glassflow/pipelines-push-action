@@ -183,13 +183,19 @@ def push_to_cloud(
     client: GlassFlowClient,
     dry_run: bool = False,
 ):
-    deleted_pipelines = [
-        yaml_file_to_pipeline(f, client.personal_access_token)
-        for f in files_deleted
-        if f.suffix in [".yaml", ".yml"]
-    ]
+    deleted_pipelines = []
     for file in files_deleted:
-        file.unlink()
+        if file.suffix not in [".yaml", ".yml"]:
+            continue
+
+        try:
+            deleted_pipelines.append(
+                yaml_file_to_pipeline(file, client.personal_access_token)
+            )
+        except Exception as e:
+            log.error(e)
+        finally:
+            file.unlink()
 
     yaml_files_to_update = get_yaml_files_with_changes(
         pipelines_dir=pipelines_dir, files=files_changed
