@@ -42,7 +42,9 @@ jobs:
 - **to-update-count** - Number of pipelines to update.
 - **to-update-ids** - Pipeline IDs that will be updated.
 - **to-delete-count** - Number of pipelines to delete.
-- **to-delete-ids** - Pipeline IDs that will be deleted.
+- **to-delete-ids** - Pipeline IDs that will be deleted. 
+- **space-to-create-count** - Number of spaces to be created
+- **spaces-to-create-ids** - Space IDs that were created
 
 ## Notes
 

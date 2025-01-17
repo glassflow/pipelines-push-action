@@ -38,6 +38,12 @@ outputs:
   to-delete-ids:
     description: Pipeline IDs that will be deleted
     value: ${{ steps.run.outputs.to-delete-ids }}
+  space-to-create-count:
+    description: Number of spaces to be created
+    value: ${{ steps.run.outputs.space-to-create-count }}
+  spaces-to-create-ids:
+    description: Space IDs that were created
+    value: ${{ steps.run.outputs.spaces-to-create-ids }}
 
 runs:
   using: "composite"
