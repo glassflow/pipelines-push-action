@@ -15,6 +15,11 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
       - name: Install
         shell: bash
         run: uv sync --all-extras --dev
