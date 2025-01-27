@@ -64,12 +64,7 @@ runs:
           ${{ inputs.pipelines-dir }}/**/*.{py,yaml,yml}
           ${{ inputs.pipelines-dir }}/**/requirements.txt
 
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        cache: 'pip' # caching pip dependencies
-
-    - name: Setup
+    - name: Download repo
       shell: bash
       id: setup
       run: |
@@ -88,18 +83,28 @@ runs:
         TEMPDIR=/tmp/action-script/
         mkdir -p ${TEMPDIR}
         cd ${TEMPDIR}
-        echo "tempdir=${TEMPDIR}" >> $GITHUB_OUTPUT
+        echo "tempdir=${TEMPDIR}${SCRIPT_DIR}" >> $GITHUB_OUTPUT
         
         echo "Downloading action script ..."
         wget "https://github.com/glassflow/pipelines-push-action/archive/${ARCHIVE}"
         tar -xzvf *.tar.gz
-        cp -r ${SCRIPT_DIR}/* .
-        
-        echo "Installing python dependencies ..."
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt
 
-    - name: Set script arguments
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        cache-dependency-glob: "uv.lock"
+
+    - name: "Set up Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: "${{ steps.setup.outputs.tempdir }}/pyproject.toml"
+
+    - name: Install
+      shell: bash
+      run: uv sync --directory ${{ steps.setup.outputs.tempdir }}
+
+    - name: Set arguments
       id: set-arguments
       shell: bash
       run: |
@@ -121,8 +126,7 @@ runs:
     - name: Run
       id: run
       shell: bash
-      run: |
-        python ${{ steps.setup.outputs.tempdir }}/src/script/main.py ${{ steps.set-arguments.outputs.args }}
+      run: uv run pipelines-push-action ${{ steps.set-arguments.outputs.args }}
 
     - name: Clean up
       id: clean-up

@@ -1,0 +1,29 @@
+name: Pipeline with shared code 1
+
+# Space: cicd-test
+space_id: my-space-id
+space_name: test
+
+components:
+  - id: source
+    name: Source
+    type: source
+
+  - id: encrypt_email
+    name: Encrypt Email
+    type: transformer
+    requirements:
+      path: requirements.txt
+    transformation:
+      path: handler.py
+    env_vars:
+      - name: AES_KEY
+        value: 88c5ce4f9ea5343b49683bc3c35894a4
+    inputs:
+      - source
+
+  - id: sink
+    name: Sink
+    type: sink
+    inputs:
+      - encrypt_email

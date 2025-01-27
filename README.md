@@ -2,13 +2,15 @@
 
 This Github Action lets you automate GlassFlow pipelines deployments as code.
 
-This GA does:
-- Get all the files changed since last commit (using https://github.com/marketplace/actions/changed-files)
-  - changes on `*.yaml`, `*.py` and `requirements.txt` files
-- Update all the pipelines with changes
-  - If the YAML has `pipeline_id`, the action will update the pipeline with the new configuration (assume the pipeline exists, it fails otherwise).
-  - If the YAML does not include the `pipeline_id`, it will create a new pipeline and update the YAML to add the `pipeline_id`.
-- Delete all pipelines which YAML file has been deleted
+This Github Action does:
+
+- **Track Changes in your Pipelines**: Get all the files changed since last commit (using https://github.com/marketplace/actions/changed-files). Changes on `*.yaml`, `*.py` and `requirements.txt` files
+- **Create Spaces**: Pipelines can be assigned to non-existing spaces by omitting the key `space_id` and adding the key `space_name`. The action will create a new space with the give name and fill in the `space_id` in the YAML file.
+- **Create Pipelines**: New pipelines will not have an ID assigned until they are created, so the YAML file should have an empty key `pipeline_id` or 
+no `pipeline_id` key. The action will create the pipeline and fill in the ID in the YAML file.
+- **Update Pipelines**: Any changes to the pipeline YAML file or the files liked to he pipeline (`requirements.txt` or python files) will be 
+pushed to GlassFlow.
+- **Delete Pipelines**: This action will delete pipelines which YAML file gets deleted!
 
 
 ## Usage
