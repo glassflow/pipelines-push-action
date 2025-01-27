@@ -5,13 +5,13 @@ from pathlib import Path
 
 from glassflow import GlassFlowClient
 
-from github_utils import set_outputs
-from yaml_utils import (
+from pipelines_push_action.github_utils import set_outputs
+from pipelines_push_action.yaml_utils import (
     load_yaml_file,
     map_yaml_to_files,
     yaml_file_to_pipeline,
-    add_pipeline_id_to_yaml,
-    add_space_id_to_yaml
+    update_pipeline_id_in_yaml,
+    update_space_id_in_yaml
 )
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
@@ -65,7 +65,7 @@ def create_pipelines(to_create, client: GlassFlowClient) -> list[str]:
 
         new_pipeline = gf_pipeline.create()
         new_pipeline_ids.append(new_pipeline.id)
-        add_pipeline_id_to_yaml(file, new_pipeline.id)
+        update_pipeline_id_in_yaml(file, new_pipeline.id)
         log.info(f"Created pipeline {new_pipeline.id}")
     return new_pipeline_ids
 
@@ -113,7 +113,7 @@ def create_spaces(to_create, client: GlassFlowClient) -> dict[Path, str]:
 
         space = client.create_space(name)
         new_spaces[file] = space.id
-        add_space_id_to_yaml(file, space.id)
+        update_space_id_in_yaml(file, space.id)
     return new_spaces
 
 

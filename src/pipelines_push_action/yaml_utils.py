@@ -1,19 +1,52 @@
 import itertools
 from pathlib import Path
+from typing import Any
 
-from yaml import safe_load
+import ruamel.yaml
 from glassflow import Pipeline as GlassFlowPipeline
 
-from models import Pipeline
+from pipelines_push_action.errors import YAMLFileEmptyError
+from pipelines_push_action.models import Pipeline
 
 
 def load_yaml_file(file):
     """Loads Pipeline YAML file"""
     # Load YAML
-    with open(file) as f:
-        yaml_data = safe_load(f)
-
+    yaml_data = open_yaml(file)
     return Pipeline(**yaml_data)
+
+
+def open_yaml(path: Path) -> dict[str, Any]:
+    """Opens a yaml file... Nothing too exciting there.
+
+    Args:
+        path (Path): Full filename path pointing to the yaml file we want to open.
+
+    Returns:
+        Dict[str, Any]: A python dict containing the content from the yaml file.
+    """
+    if path.is_file():
+        with open(path, "r") as stream:
+            ryaml = ruamel.yaml.YAML(typ="rt")
+            yaml_dict = ryaml.load(stream)
+            if yaml_dict:
+                return yaml_dict
+            raise YAMLFileEmptyError(f"The following file {path.resolve()} seems empty.")
+    raise FileNotFoundError(f"File {path.resolve()} was not found.")
+
+
+def save_yaml(path: Path, data: dict[str, Any]) -> None:
+    """Saves a YAML content.
+
+    Args:
+        path (Path): Full filename path pointing to the yaml file we want to save.
+        data (dict[str, Any]): Data to save in the file.
+    """
+    with open(path, "w") as outfile:
+        ryaml = ruamel.yaml.YAML(typ="rt")
+        ryaml.width = 100
+        ryaml.indent(mapping=2, sequence=4, offset=2)
+        ryaml.dump(data, outfile)
 
 
 def map_yaml_to_files(path: Path) -> dict[Path, list[Path]]:
@@ -96,17 +129,39 @@ def yaml_file_to_pipeline(
     )
 
 
-def add_pipeline_id_to_yaml(yaml_path: Path, pipeline_id: str):
-    """Prepend the pipeline id to the yaml file"""
-    with open(yaml_path, "r+") as f:
-        content = f.read()
-        f.seek(0, 0)
-        f.write(f"pipeline_id: {pipeline_id}" + "\n" + content)
+def pipeline_to_yaml(pipeline: Pipeline, input_yaml: Path, output_yaml: Path = None) -> None:
+    yaml_data = open_yaml(input_yaml)
+
+    pipeline_dict = pipeline.model_dump(exclude_none=True)
+
+    yaml_data["pipeline_id"] = pipeline.pipeline_id
+    yaml_data["space_id"] = pipeline.space_id
+    yaml_data["name"] = pipeline.name
+    for idx, c in enumerate(pipeline_dict["components"]):
+        yaml_data["components"][idx].update(c)
+
+    if output_yaml is not None:
+        save_yaml(output_yaml, yaml_data)
+    else:
+        save_yaml(input_yaml, yaml_data)
+
+def update_pipeline_id_in_yaml(pipeline_id: str, input_yaml: Path, output_yaml: Path = None) -> None:
+    """Update the pipeline id to the yaml file"""
+    yaml_data = open_yaml(input_yaml)
+    yaml_data["pipeline_id"] = pipeline_id
+
+    if output_yaml is not None:
+        save_yaml(output_yaml, yaml_data)
+    else:
+        save_yaml(input_yaml, yaml_data)
 
 
-def add_space_id_to_yaml(yaml_path: Path, space_id: str):
-    """Prepend the space id to the yaml file"""
-    with open(yaml_path, "r+") as f:
-        content = f.read()
-        f.seek(0, 0)
-        f.write(f"space_id: {space_id}" + "\n" + content)
+def update_space_id_in_yaml(space_id: str, input_yaml: Path, output_yaml: Path = None) -> None:
+    """Update the space id to the yaml file"""
+    yaml_data = open_yaml(input_yaml)
+    yaml_data["space_id"] = space_id
+
+    if output_yaml is not None:
+        save_yaml(output_yaml, yaml_data)
+    else:
+        save_yaml(input_yaml, yaml_data)

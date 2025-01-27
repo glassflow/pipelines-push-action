@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pipelines-push-action"
+description = "This Github Action lets you automate GlassFlow pipelines deployments as code."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "glassflow",
+    "ruamel.yaml>=0.18.10",
+    "pydantic>=2.10.5",
+    "eval_type_backport>=0.2.0",
+]
+
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+]
+
+[project.scripts]
+pipelines-push-action = "pipelines_push_action:main"
+
+[tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]

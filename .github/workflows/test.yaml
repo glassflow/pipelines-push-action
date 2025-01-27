@@ -3,7 +3,26 @@ on:
   pull_request:
 
 jobs:
-  test:
+  code-test:
+    name: Code Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install
+        shell: bash
+        run: uv sync --all-extras --dev
+
+      - name: pytest
+        shell: bash
+        run: uv run pytest
+
+  action-test:
     name: Github Action Test
     runs-on: ubuntu-latest
     steps:
@@ -15,7 +34,7 @@ jobs:
         with:
           glassflow-personal-access-token: ${{ secrets.GlassFlowPAT }}
           dry-run: 'true'
-          pipelines-dir: "script"
+          pipelines-dir: "tests/data"
           sha: ${{ github.sha }}
 
       - name: Print Output
