@@ -64,9 +64,6 @@ runs:
           ${{ inputs.pipelines-dir }}/**/*.{py,yaml,yml}
           ${{ inputs.pipelines-dir }}/**/requirements.txt
 
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-
     - name: Download repo
       shell: bash
       id: setup
@@ -92,9 +89,16 @@ runs:
         wget "https://github.com/glassflow/pipelines-push-action/archive/${ARCHIVE}"
         tar -xzvf *.tar.gz
 
-    - uses: actions/setup-python@v5
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
       with:
-        python-version-file: "${{ steps.setup.outputs.tempdir }}pyproject.toml"
+        enable-cache: true
+        cache-dependency-glob: "uv.lock"
+
+    - name: "Set up Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: "${{ steps.setup.outputs.tempdir }}/pyproject.toml"
 
     - name: Install
       shell: bash
@@ -122,7 +126,7 @@ runs:
     - name: Run
       id: run
       shell: bash
-      run: pipelines-push-action ${{ steps.set-arguments.outputs.args }}
+      run: uv run pipelines-push-action ${{ steps.set-arguments.outputs.args }}
 
     - name: Clean up
       id: clean-up
