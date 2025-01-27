@@ -1,6 +1,9 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm>=8"]
+requires = [ "setuptools>=41", "wheel", "setuptools-git-versioning>=2.0,<3", ]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools-git-versioning]
+enabled = true
 
 [project]
 name = "pipelines-push-action"
@@ -23,8 +26,6 @@ tests = [
 
 [project.scripts]
 pipelines-push-action = "pipelines_push_action:main"
-
-[tool.setuptools_scm]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
