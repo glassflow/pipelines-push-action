@@ -89,20 +89,15 @@ runs:
         wget "https://github.com/glassflow/pipelines-push-action/archive/${ARCHIVE}"
         tar -xzvf *.tar.gz
 
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-        cache-dependency-glob: "uv.lock"
-
-    - name: "Set up Python"
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version-file: "${{ steps.setup.outputs.tempdir }}/pyproject.toml"
+        cache: 'pip'
 
-    - name: Install
+    - name: Install dependencies
       shell: bash
-      run: uv sync --directory ${{ steps.setup.outputs.tempdir }}
+      run: pip install -e ${{ steps.setup.outputs.tempdir }}
 
     - name: Set arguments
       id: set-arguments
@@ -126,13 +121,13 @@ runs:
     - name: Run
       id: run
       shell: bash
-      run: uv run pipelines-push-action ${{ steps.set-arguments.outputs.args }}
+      run: pipelines-push-action ${{ steps.set-arguments.outputs.args }}
 
     - name: Clean up
       id: clean-up
       shell: bash
       run: rm -rf ${{ steps.setup.outputs.tempdir }}
-          
+
     - name: Commit new Pipeline IDs
       if: ${{ (inputs.dry-run == 'false') && steps.run.outputs.to-create-ids }}
       uses: stefanzweifel/git-auto-commit-action@v5

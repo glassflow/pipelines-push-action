@@ -65,7 +65,7 @@ def create_pipelines(to_create, client: GlassFlowClient) -> list[str]:
 
         new_pipeline = gf_pipeline.create()
         new_pipeline_ids.append(new_pipeline.id)
-        update_pipeline_id_in_yaml(file, new_pipeline.id)
+        update_pipeline_id_in_yaml(input_yaml=file, pipeline_id=new_pipeline.id)
         log.info(f"Created pipeline {new_pipeline.id}")
     return new_pipeline_ids
 
@@ -113,7 +113,7 @@ def create_spaces(to_create, client: GlassFlowClient) -> dict[Path, str]:
 
         space = client.create_space(name)
         new_spaces[file] = space.id
-        update_space_id_in_yaml(file, space.id)
+        update_space_id_in_yaml(space_id=space.id, input_yaml=file)
     return new_spaces
 
 

@@ -11,7 +11,7 @@ description = "This Github Action lets you automate GlassFlow pipelines deployme
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "glassflow",
+    "glassflow>=2.0.8",
     "ruamel.yaml>=0.18.10",
     "pydantic>=2.10.5",
     "eval_type_backport>=0.2.0",
