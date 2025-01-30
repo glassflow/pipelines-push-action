@@ -1,19 +1,30 @@
 # pipelines-push-action
 
-This Github Action lets you automate GlassFlow pipelines deployments as code.
+A GitHub Action to automate GlassFlow pipeline deployments as code.
 
-This Github Action does:
+## Features
 
-- **Track Changes in your Pipelines**: Get all the files changed since last commit (using https://github.com/marketplace/actions/changed-files). Changes on `*.yaml`, `*.py` and `requirements.txt` files
-- **Create Spaces**: Pipelines can be assigned to non-existing spaces by omitting the key `space_id` and adding the key `space_name`. The action will create a new space with the give name and fill in the `space_id` in the YAML file.
-- **Create Pipelines**: New pipelines will not have an ID assigned until they are created, so the YAML file should have an empty key `pipeline_id` or 
-no `pipeline_id` key. The action will create the pipeline and fill in the ID in the YAML file.
-- **Update Pipelines**: Any changes to the pipeline YAML file or the files liked to he pipeline (`requirements.txt` or python files) will be 
-pushed to GlassFlow.
-- **Delete Pipelines**: This action will delete pipelines which YAML file gets deleted!
+This GitHub Action enables you to:
 
+- **Track Changes in Your Pipelines**: Detect changes in `*.yaml`, `*.py`, and `requirements.txt` files since the last commit (via [Changed Files Action](https://github.com/marketplace/actions/changed-files)).
+- **Create Spaces**: Assign pipelines to new spaces by omitting `space_id` and specifying `space_name`. The action will create a space with the given name and update the YAML file with the assigned `space_id`.
+- **Create Pipelines**: New pipelines without an assigned `pipeline_id` (empty or missing `pipeline_id` key) will be created, and the YAML file will be updated with the assigned ID.
+- **Update Pipelines**: Changes to pipeline YAML files, `requirements.txt`, or linked Python files will be pushed to GlassFlow.
+- **Delete Pipelines**: If a pipeline's YAML file is deleted, the corresponding pipeline will be deleted from GlassFlow.
+
+## Configuration
+
+To use this action, configure your repository with a **GlassFlow Personal Access Token**:
+
+1. Go to your repository's Settings > Secrets and variables > Actions.
+2. Add a new secret named GlassFlowPAT (or any name you prefer).
+3. Set the value to your GlassFlow Personal Access Token, which can be found on your GlassFlow profile page.
+
+GitHub encrypts your token, and the action will not expose it in logs.
 
 ## Usage
+
+Below is an example GitHub Actions workflow to push pipelines to GlassFlow on every push to the `main` branch:
 
 ```yaml
 name: Push to GlassFlow
@@ -33,22 +44,33 @@ jobs:
 
 ## Inputs
 
-- **glassflow-personal-access-token** _(required)_ - GlassFlow Personal Access Token (can be found in your profile https://app.glassflow.dev/profile). Use Github secrets to store your GlassFlow Personal Access Token.
-- **pipelines-dir** _(optional)_ - The directory containing your pipelines (Default: `'pipelines'`).
-- **dry-run** _(optional)_ - If set to 'true' the action will not push changes to GlassFlow (Default: `'false'`).
+| Name | Required | Description |
+|------|----------|-------------|
+| `glassflow-personal-access-token` | ✅ | GlassFlow Personal Access Token (stored in GitHub Secrets). |
+| `pipelines-dir` | ❌ | Directory containing pipelines (Default: `'pipelines'`). |
+| `dry-run` | ❌ | If `'true'`, changes will not be pushed to GlassFlow (Default: `'false'`). |
 
 ## Outputs
 
-- **to-create-count** - Number of new pipelines to create.
-- **to-create-ids** - Pipeline IDs that are created (only available if input `dry-run` is `false`).
-- **to-update-count** - Number of pipelines to update.
-- **to-update-ids** - Pipeline IDs that will be updated.
-- **to-delete-count** - Number of pipelines to delete.
-- **to-delete-ids** - Pipeline IDs that will be deleted. 
-- **space-to-create-count** - Number of spaces to be created
-- **spaces-to-create-ids** - Space IDs that were created
+| Output | Description |
+|--------|-------------|
+| `to-create-count` | Number of new pipelines to create. |
+| `to-create-ids` | Pipeline IDs created (available only if `dry-run` is `false`). |
+| `to-update-count` | Number of pipelines to update. |
+| `to-update-ids` | Pipeline IDs updated. |
+| `to-delete-count` | Number of pipelines to delete. |
+| `to-delete-ids` | Pipeline IDs deleted. |
+| `space-to-create-count` | Number of spaces to be created. |
+| `spaces-to-create-ids` | Space IDs created. |
 
-## Notes
+## FAQs
 
-- **What happens if a pipeline was deleted from the Webapp and changes are introduced in the pipeline's YAML?**: The action will fail since the `pipeline_id` from the YAML will not exist in GlassFlow anymore
-- **What happens if I update a pipeline in the Webapp?**: This GA action only syncs from YAML to GlassFlow, not the other way around. So if a pipeline is modified in the webapp, the changes might be overwritten next time you add changes to the pipeline's YAML, handler or requirements files.
+- **What happens if a pipeline was deleted from the Web App, but its YAML file is modified?**
+  - The action will fail because the `pipeline_id` in the YAML file no longer exists in GlassFlow.
+- **What happens if I update a pipeline in the Web App?**
+  - This action syncs changes **from YAML to GlassFlow** only. Updates made in the web app may be overwritten when changes are pushed from the YAML, handler, or `requirements.txt` files.
+
+---
+
+This action provides a streamlined way to manage your GlassFlow pipelines as code, ensuring consistency and automation in your deployment process.
+
