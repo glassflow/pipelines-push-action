@@ -14,13 +14,21 @@ This GitHub Action enables you to:
 
 ## Configuration
 
+### Store Your Token Securely
 To use this action, configure your repository with a **GlassFlow Personal Access Token**:
 
-1. Go to your repository's Settings > Secrets and variables > Actions.
-2. Add a new secret named GlassFlowPAT (or any name you prefer).
-3. Set the value to your GlassFlow Personal Access Token, which can be found on your GlassFlow profile page.
+- Navigate to `Settings > Secrets and variables > Actions` in your repository.
+- Click `New repository secret`.
+- Set the secret name (e.g., `GlassFlowPAT`).
+- Retrieve your access token from your [GlassFlow profile](https://app.glassflow.dev/profile) and paste it as the secret value.
 
-GitHub encrypts your token, and the action will not expose it in logs.
+GitHub encrypts your token, and the action will not expose it in logs, ensuring security.
+
+### Set Workflow Permissions
+For the action to update YAML files with assigned `space_id` and `pipeline_id` values for newly created spaces and pipelines:
+
+- Go to `Settings > Actions > General > Workflow Permissions`.
+- Ensure `Read and write permissions` are enabled.
 
 ## Usage
 
