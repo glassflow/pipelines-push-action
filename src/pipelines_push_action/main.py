@@ -90,6 +90,7 @@ def update_pipelines(to_update, client: GlassFlowClient) -> None:
             source_kind=gf_pipeline.source_kind,
             source_config=gf_pipeline.source_config,
             env_vars=gf_pipeline.env_vars,
+            metadata={"view_only": True},
         )
         log.info(f"Updated pipeline {gf_pipeline.id}")
 

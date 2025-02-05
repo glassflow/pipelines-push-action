@@ -126,6 +126,7 @@ def yaml_file_to_pipeline(
         sink_config=sink.config,
         source_kind=source.kind,
         source_config=source.config,
+        metadata={"view_only": True},
     )
 
 
