@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from typing import Annotated, Literal, Union
 
-from pydantic import BaseModel, Field, ValidationError, model_validator
+from pydantic import BaseModel, Field, RootModel, model_validator
 
 
 class Pipeline(BaseModel):
@@ -20,9 +20,11 @@ class Pipeline(BaseModel):
     def check_space_filled(self):
         """Validate space is filled"""
         if self.space_id is None and self.space_name is None:
-            raise ValidationError("`space_id` or `space_name` must be filled")
+            raise ValueError("`space_id` or `space_name` must be filled")
         if self.pipeline_id is not None and self.space_id is None:
-            raise ValidationError("If `pipeline_id` is provided you must specify it's `space_id`")
+            raise ValueError(
+                "If `pipeline_id` is provided you must specify it's `space_id`"
+            )
         return self
 
     @model_validator(mode="after")
@@ -53,7 +55,7 @@ class EnvironmentVariable(BaseModel):
     @model_validator(mode="after")
     def check_filled(self):
         if self.value_secret_ref is None and self.value is None:
-            raise ValidationError("value or value_secret_ref must be filled")
+            raise ValueError("value or value_secret_ref must be filled")
         return self
 
 
@@ -64,7 +66,7 @@ class Requirements(BaseModel):
     @model_validator(mode="after")
     def check_filled(self):
         if self.path is None and self.value is None:
-            raise ValidationError("Path or value must be filled")
+            raise ValueError("Path or value must be filled")
         return self
 
 
@@ -75,7 +77,7 @@ class Transformation(BaseModel):
     @model_validator(mode="after")
     def check_filled(self):
         if self.path is None and self.value is None:
-            raise ValidationError("Path or value must be filled")
+            raise ValueError("Path or value must be filled")
         return self
 
 

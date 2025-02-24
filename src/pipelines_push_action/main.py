@@ -9,18 +9,16 @@ from pipelines_push_action.github_utils import set_outputs
 from pipelines_push_action.yaml_utils import (
     load_yaml_file,
     map_yaml_to_files,
-    yaml_file_to_pipeline,
     update_pipeline_id_in_yaml,
-    update_space_id_in_yaml
+    update_space_id_in_yaml,
+    yaml_file_to_pipeline,
 )
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
 log = logging.getLogger(__name__)
 
 
-def generate_outputs(
-    changes: dict
-):
+def generate_outputs(changes: dict):
     """Returns a dictionary of changes that will be applied"""
     to_create = len(changes["to_create"])
     to_update = len(changes["to_update"])
@@ -32,24 +30,28 @@ def generate_outputs(
     message = f"""
 Expected changes on your GlassFlow pipelines:
 \t‣ Create {to_create} pipelines
-\t‣ Update {to_update} pipelines {"" if to_update == 0 else f'(IDs: {to_update_ids})'}
-\t‣ Delete {to_delete} pipelines {"" if to_update == 0 else f'(IDs: {to_delete_ids})'}
+\t‣ Update {to_update} pipelines {"" if to_update == 0 else f"(IDs: {to_update_ids})"}
+\t‣ Delete {to_delete} pipelines {"" if to_update == 0 else f"(IDs: {to_delete_ids})"}
     """
     spaces_to_create_count = len(changes["spaces_to_create"])
     if spaces_to_create_count > 0:
         spaces_to_create_names = [s["name"] for s in changes["spaces_to_create"]]
-        message += (f"\nThe following {spaces_to_create_count} "
-                    f"new spaces will be created: {' '.join(spaces_to_create_names)}")
+        message += (
+            f"\nThe following {spaces_to_create_count} "
+            f"new spaces will be created: {' '.join(spaces_to_create_names)}"
+        )
 
     log.info(message)
-    set_outputs({
-        "to-create-count": to_create,
-        "to-update-count": to_update,
-        "to-update-ids": to_update_ids,
-        "to-delete-count": to_delete,
-        "to-delete-ids": to_delete_ids,
-        "space-to-create-count": spaces_to_create,
-    })
+    set_outputs(
+        {
+            "to-create-count": to_create,
+            "to-update-count": to_update,
+            "to-update-ids": to_update_ids,
+            "to-delete-count": to_delete,
+            "to-delete-ids": to_delete_ids,
+            "space-to-create-count": spaces_to_create,
+        }
+    )
 
 
 def create_pipelines(to_create, client: GlassFlowClient) -> list[str]:
@@ -60,7 +62,7 @@ def create_pipelines(to_create, client: GlassFlowClient) -> list[str]:
         gf_pipeline = yaml_file_to_pipeline(
             pipeline_file=file,
             pipeline=pipeline,
-            personal_access_token=client.personal_access_token
+            personal_access_token=client.personal_access_token,
         )
 
         new_pipeline = gf_pipeline.create()
@@ -77,7 +79,7 @@ def update_pipelines(to_update, client: GlassFlowClient) -> None:
         gf_pipeline = yaml_file_to_pipeline(
             pipeline_file=file,
             pipeline=pipeline,
-            personal_access_token=client.personal_access_token
+            personal_access_token=client.personal_access_token,
         )
 
         existing_pipeline = client.get_pipeline(gf_pipeline.id)
@@ -119,9 +121,7 @@ def create_spaces(to_create, client: GlassFlowClient) -> dict[Path, str]:
 
 
 def get_pipelines_to_change(
-    files_deleted: list[Path],
-    files_changed: list[Path],
-    pipelines_dir: Path
+    files_deleted: list[Path], files_changed: list[Path], pipelines_dir: Path
 ) -> dict:
     """Returns a dictionary of changes that will be applied"""
     pipeline_2_files = map_yaml_to_files(pipelines_dir)
@@ -222,10 +222,7 @@ def main():
         nargs="+",
     )
     parser.add_argument(
-        "--root-dir",
-        help="Github Root directory",
-        type=Path,
-        default="."
+        "--root-dir", help="Github Root directory", type=Path, default="."
     )
     parser.add_argument(
         "--pipelines-dir",

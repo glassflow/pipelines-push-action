@@ -22,6 +22,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 tests = [
     "pytest",
+    "ruff>=0.9.0",
 ]
 
 [project.scripts]
@@ -30,3 +31,22 @@ pipelines-push-action = "pipelines_push_action.main:main"
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = ["tests"]
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

@@ -27,12 +27,14 @@ def open_yaml(path: Path) -> dict[str, Any]:
         Dict[str, Any]: A python dict containing the content from the yaml file.
     """
     if path.is_file():
-        with open(path, "r") as stream:
+        with open(path) as stream:
             ryaml = ruamel.yaml.YAML(typ="rt")
             yaml_dict = ryaml.load(stream)
             if yaml_dict:
                 return yaml_dict
-            raise YAMLFileEmptyError(f"The following file {path.resolve()} seems empty.")
+            raise YAMLFileEmptyError(
+                f"The following file {path.resolve()} seems empty."
+            )
     raise FileNotFoundError(f"File {path.resolve()} was not found.")
 
 
@@ -64,8 +66,8 @@ def map_yaml_to_files(path: Path) -> dict[Path, list[Path]]:
             continue
 
         if (
-                transformer.requirements is not None and
-                transformer.requirements.path is not None
+            transformer.requirements is not None
+            and transformer.requirements.path is not None
         ):
             path = file.parent / transformer.requirements.path
             mapping[file].append(path)
@@ -172,7 +174,10 @@ def pipeline_to_yaml(
     else:
         save_yaml(input_yaml, yaml_data)
 
-def update_pipeline_id_in_yaml(pipeline_id: str, input_yaml: Path, output_yaml: Path = None) -> None:
+
+def update_pipeline_id_in_yaml(
+    pipeline_id: str, input_yaml: Path, output_yaml: Path = None
+) -> None:
     """Update the pipeline id to the yaml file"""
     yaml_data = open_yaml(input_yaml)
     yaml_data["pipeline_id"] = pipeline_id
@@ -183,7 +188,9 @@ def update_pipeline_id_in_yaml(pipeline_id: str, input_yaml: Path, output_yaml: 
         save_yaml(input_yaml, yaml_data)
 
 
-def update_space_id_in_yaml(space_id: str, input_yaml: Path, output_yaml: Path = None) -> None:
+def update_space_id_in_yaml(
+    space_id: str, input_yaml: Path, output_yaml: Path = None
+) -> None:
     """Update the space id to the yaml file"""
     yaml_data = open_yaml(input_yaml)
     yaml_data["space_id"] = space_id

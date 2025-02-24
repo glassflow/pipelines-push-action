@@ -1,9 +1,7 @@
+import filecmp
 from pathlib import Path
 
-import filecmp
-
 from pipelines_push_action import yaml_utils
-
 
 
 def test_load_yaml_file(yaml_file):
@@ -23,16 +21,13 @@ def test_save_yaml(yaml_file):
     finally:
         new_file.unlink()
 
+
 def test_update_pipeline_id_in_yaml(yaml_file):
     pipeline = yaml_utils.load_yaml_file(yaml_file)
     new_file = Path("tests/data/pipeline_new.yaml")
     pipeline.pipeline_id = "test-pipeline-id"
     try:
-        yaml_utils.update_pipeline_id_in_yaml(
-            pipeline.pipeline_id,
-            yaml_file,
-            new_file
-        )
+        yaml_utils.update_pipeline_id_in_yaml(pipeline.pipeline_id, yaml_file, new_file)
         new_pipeline = yaml_utils.load_yaml_file(new_file)
         assert new_pipeline.pipeline_id == pipeline.pipeline_id
     finally:
@@ -44,15 +39,12 @@ def test_update_space_id_in_yaml(yaml_file):
     new_file = Path("tests/data/pipeline_new.yaml")
     pipeline.space_id = "new-space-id"
     try:
-        yaml_utils.update_space_id_in_yaml(
-             pipeline.space_id,
-            yaml_file,
-            new_file
-        )
+        yaml_utils.update_space_id_in_yaml(pipeline.space_id, yaml_file, new_file)
         new_pipeline = yaml_utils.load_yaml_file(new_file)
         assert new_pipeline.space_id == pipeline.space_id
     finally:
         new_file.unlink()
+
 
 def test_map_yaml_to_files(yaml_file):
     mappings = yaml_utils.map_yaml_to_files(Path(yaml_file.parent))
