@@ -2,6 +2,8 @@ from pathlib import Path
 
 import pytest
 
+from pipelines_push_action.yaml_utils import load_yaml_file
+
 
 @pytest.fixture
 def yaml_file():
@@ -10,4 +12,4 @@ def yaml_file():
 
 @pytest.fixture
 def pipeline_yaml(yaml_file):
-    return
+    return load_yaml_file(yaml_file)

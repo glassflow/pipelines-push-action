@@ -8,6 +8,14 @@ components:
   - id: source
     name: Source
     type: source
+    kind: google_pubsub
+    config:
+      project_id:
+        value: my-project-id
+      subscription_id:
+        value: my-subscription-id
+      credentials_json:
+        secret_ref: mySecretKey
 
   - id: encrypt_email
     name: Encrypt Email
@@ -25,5 +33,14 @@ components:
   - id: sink
     name: Sink
     type: sink
+    kind: webhook
+    config:
+      url:
+        value: www.mywebhookurl.com
+      method:
+        value: post
+      headers:
+        - name: Content-Type
+          value: application/json
     inputs:
       - encrypt_email

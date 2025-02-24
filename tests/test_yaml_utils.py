@@ -62,3 +62,14 @@ def test_map_yaml_to_files(yaml_file):
             Path("tests/data/handler.py"),
         ]
     }
+
+
+def test_yaml_file_to_pipeline_ok(yaml_file, pipeline_yaml):
+    pipeline = yaml_utils.yaml_file_to_pipeline(
+        pipeline_file=yaml_file,
+        pipeline=pipeline_yaml,
+        personal_access_token="my-personal-access-token",
+    )
+    assert pipeline.name == "Pipeline with shared code 1"
+    assert pipeline.metadata == {"view_only": True}
+    assert pipeline.source_config

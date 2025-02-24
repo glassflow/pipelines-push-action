@@ -93,38 +93,58 @@ class TransformerComponent(BaseComponent):
     env_vars: list[EnvironmentVariable] | None = Field(None)
 
 
+class ConfigParameter(BaseModel):
+    value: str | None = Field(None)
+    secret_ref: str | None = Field(None)
+
+    @model_validator(mode="after")
+    def check_exclusive_fields(self):
+        if not (self.value or self.secret_ref):  # Neither is set
+            raise ValueError("Either 'value' or 'secret_ref' must be specified.")
+        if self.value and self.secret_ref:  # Both are set
+            raise ValueError("Only one of 'value' or 'secret_ref' can be specified.")
+        return self
+
+
+class ConfigHeaderParameter(BaseModel):
+    name: str
+    value: str | None = Field(None)
+
+
+class ConnectorConfig(
+    RootModel[dict[str, Union[ConfigParameter, list[ConfigHeaderParameter]]]]
+):
+    pass
+
+
 class SourceComponent(BaseComponent):
     type: Literal["source"]
     kind: str | None = Field(None)
-    config: dict | None = Field(None)
-    config_secret_ref: str | None = Field(None)
+    config: ConnectorConfig | None = Field(None)
 
     @model_validator(mode="after")
     def check_filled(self):
-        if (
-            self.kind is not None
-            and self.config is None
-            and self.config_secret_ref is None
-        ):
-            raise ValidationError("config or config_secret_ref must be filled")
+        if self.kind and not self.config:
+            raise ValueError(
+                "The 'config' field must be provided when 'kind' is specified. "
+                "Please ensure that both 'kind' and 'config' are filled."
+            )
         return self
 
 
 class SinkComponent(BaseComponent):
     type: Literal["sink"]
     kind: str | None = Field(None)
-    config: dict | None = Field(None)
-    config_secret_ref: str | None = Field(None)
+    config: ConnectorConfig | None = Field(None)
     inputs: list[str]
 
     @model_validator(mode="after")
     def check_filled(self):
-        if (
-            self.kind is not None
-            and self.config is None
-            and self.config_secret_ref is None
-        ):
-            raise ValidationError("config or config_secret_ref must be filled")
+        if self.kind and not self.config:
+            raise ValueError(
+                "The 'config' field must be provided when 'kind' is specified. "
+                "Please ensure that both 'kind' and 'config' are filled."
+            )
         return self
 
 

@@ -4,6 +4,7 @@ from typing import Any
 
 import ruamel.yaml
 from glassflow import Pipeline as GlassFlowPipeline
+from glassflow import Secret
 
 from pipelines_push_action.errors import YAMLFileEmptyError
 from pipelines_push_action.models import Pipeline
@@ -112,8 +113,16 @@ def yaml_file_to_pipeline(
     else:
         env_vars = None
 
-    # TODO: Handle source and sink config_secret_ref
-    # TODO: Handle env_var value_secret_ref
+    # Format connectors configuration
+    if sink.config:
+        sink_config = format_connector_config(sink.config, personal_access_token)
+    else:
+        sink_config = None
+    if source.config:
+        source_config = format_connector_config(source.config, personal_access_token)
+    else:
+        source_config = None
+
     return GlassFlowPipeline(
         personal_access_token=personal_access_token,
         id=pipeline_id,
@@ -123,14 +132,31 @@ def yaml_file_to_pipeline(
         transformation_file=transform,
         requirements=requirements,
         sink_kind=sink.kind,
-        sink_config=sink.config,
+        sink_config=sink_config,
         source_kind=source.kind,
-        source_config=source.config,
+        source_config=source_config,
         metadata={"view_only": True},
     )
 
 
-def pipeline_to_yaml(pipeline: Pipeline, input_yaml: Path, output_yaml: Path = None) -> None:
+def format_connector_config(config, personal_access_token):
+    fmt_config = config.model_dump(exclude_none=True)
+    for k, v in config.root.items():
+        if isinstance(v, list):
+            fmt_config[k] = [h.model_dump(exclude_none=True) for h in v]
+        elif v.value is not None:
+            fmt_config[k] = v.value
+        else:
+            secret = Secret(
+                key=v.secret_ref, personal_access_token=personal_access_token
+            )
+            fmt_config[k] = secret
+    return fmt_config
+
+
+def pipeline_to_yaml(
+    pipeline: Pipeline, input_yaml: Path, output_yaml: Path = None
+) -> None:
     yaml_data = open_yaml(input_yaml)
 
     pipeline_dict = pipeline.model_dump(exclude_none=True)
